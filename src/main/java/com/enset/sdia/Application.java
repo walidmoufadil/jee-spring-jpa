@@ -1,13 +1,15 @@
-package com.enset.sdia.jeespringjpa;
+package com.enset.sdia;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+
 @SpringBootApplication
-public class JeeSpringJpaApplication {
+public class Application {
 
     public static void main(String[] args) {
-        SpringApplication.run(JeeSpringJpaApplication.class, args);
+        SpringApplication.run(Application.class, args);
     }
 
 }
+
