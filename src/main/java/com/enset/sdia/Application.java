@@ -7,6 +7,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.Date;
 import java.util.List;
@@ -28,23 +30,52 @@ public class Application {
                                     .name("John")
                                     .score(10)
                                     .malade(true)
-                                    .dateNaissance(new Date("01/01/1970"))
+                                    .dateNaissance(new Date())
                                     .build(),
                             Patient.builder()
                                     .name("Maria")
                                     .score(15)
                                     .malade(false)
-                                    .dateNaissance(new Date("02/02/1980"))
+                                    .dateNaissance(new Date())
+                                    .build(),
+                            Patient.builder()
+                                    .name("Maria")
+                                    .score(15)
+                                    .malade(false)
+                                    .dateNaissance(new Date())
+                                    .build(),
+                            Patient.builder()
+                                    .name("Maria")
+                                    .score(15)
+                                    .malade(false)
+                                    .dateNaissance(new Date())
+                                    .build(),
+                            Patient.builder()
+                                    .name("Maria")
+                                    .score(15)
+                                    .malade(false)
+                                    .dateNaissance(new Date())
                                     .build()
 
                     )
             );
 
-            iPatientRepo.findAll().forEach(System.out::println);
+            Page<Patient> patients = iPatientRepo.findAll(PageRequest.of(0,5));
+            patients.forEach(System.out::println);
+            System.out.println("==============================================================");
 
-            iPatientRepo.findById((long) 1);
+            Patient patient = iPatientRepo.findById((long) 1).orElse(null);
+
+            if(patient != null) {
+                patient.setMalade(true);
+                iPatientRepo.save(patient);
+            }
 
             iPatientRepo.findByNameContains("John").forEach(System.out::println);
+
+            Page<Patient> patients1 = iPatientRepo.findByMalade(true,PageRequest.of(0,4));
+            System.out.println("==============================================================");
+            patients1.forEach(System.out::println);
 
             iPatientRepo.deleteById((long) 1);
         };
