@@ -1,5 +1,6 @@
 package com.enset.sdia.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,9 +18,12 @@ public class RendezVous {
     @Enumerated(EnumType.STRING)
     private StatusRdv statusRdv;
     @ManyToOne
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Patient patient;
     @ManyToOne
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Medecin medecin;
     @OneToOne(mappedBy = "rendezVous")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Consultation consultation;
 }
