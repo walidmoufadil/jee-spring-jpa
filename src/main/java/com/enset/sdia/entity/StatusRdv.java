@@ -1,2 +1,7 @@
-package com.enset.sdia.entity;public enum StatusRdv {
+package com.enset.sdia.entity;
+
+public enum StatusRdv {
+    PENDING,
+    CANCELED,
+    ACCEPT
 }
