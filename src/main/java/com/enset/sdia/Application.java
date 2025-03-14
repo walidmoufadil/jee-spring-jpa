@@ -1,16 +1,15 @@
 package com.enset.sdia;
 
 import com.enset.sdia.entity.*;
-import com.enset.sdia.repository.IConsultationRepo;
-import com.enset.sdia.repository.IMedecinRepo;
-import com.enset.sdia.repository.IPatientRepo;
-import com.enset.sdia.repository.IRendezVousRepo;
+import com.enset.sdia.service.IConsultationService;
+import com.enset.sdia.service.IMedecinService;
+import com.enset.sdia.service.IPatientService;
+import com.enset.sdia.service.IRendezVousService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.Date;
@@ -25,7 +24,7 @@ public class Application {
     }
 
     @Bean
-    CommandLineRunner commandLineRunner(ApplicationContext ctx, IPatientRepo iPatientRepo, IMedecinRepo iMedecinRepo, IRendezVousRepo iRendezVousRepo, IConsultationRepo iConsultationRepo) {
+    CommandLineRunner commandLineRunner(ApplicationContext ctx,IConsultationService iConsultationService, IRendezVousService iRendezVousService, IMedecinService iMedecinService, IPatientService iPatientService) {
         return args -> {
             Stream.of("Maria","John","Franck","Mohammed")
                     .forEach(
@@ -35,7 +34,7 @@ public class Application {
                                 patient.setScore((int)(Math.random() * 100));
                                 patient.setMalade(Math.random()  > 0.5);
                                 patient.setDateNaissance(new Date());
-                                iPatientRepo.save(patient);
+                                iPatientService.savePatient(patient);
                             }
                     );
 
@@ -46,54 +45,47 @@ public class Application {
                                 medecin.setNom(name);
                                 medecin.setEmail(name+"@gmail.com");
                                 medecin.setSpecialite("general");
-                                iMedecinRepo.save(medecin);
+                                iMedecinService.saveMedecin(medecin);
                             }
                     );
             RendezVous rendezVous = new RendezVous();
             rendezVous.setStatusRdv(StatusRdv.PENDING);
             rendezVous.setDateRDV(new Date());
             rendezVous.setHeureRDV(new Date());
-            Medecin medecin = iMedecinRepo.findById((long)1).orElse(null);
-            Patient patient = iPatientRepo.findById((long)2).orElse(null);
 
-            if(medecin != null) {
-                rendezVous.setMedecin(medecin);
-            }
+            rendezVous.setMedecin(iMedecinService.getMedecinById(1L));
+            rendezVous.setPatient(iPatientService.getPatientById(2L));
 
-            if(medecin != null) {
-                rendezVous.setPatient(patient);
-            }
-            iRendezVousRepo.save(rendezVous);
+
+            iRendezVousService.saveRendezVoud(rendezVous);
 
             Consultation consultation = new Consultation();
             consultation.setDateConsultation(new Date());
             consultation.setRendezVous(rendezVous);
             consultation.setRapportConsultation("Vous trouverez ci-dessous le rapport du consultation, ..........");
-            iConsultationRepo.save(consultation);
+            iConsultationService.saveConsultation(consultation);
 
 
 
             System.out.println("==========================Liste Patient====================================");
-            Page<Patient> patients = iPatientRepo.findAll(PageRequest.of(0,5));
-            patients.forEach(System.out::println);
+            iPatientService.getAllPatients().forEach(p -> {
+                System.out.println(p.getId()+" "+p.getName()+" "+p.getScore()+" "+p.getDateNaissance());
+            });
 
-            System.out.println("==========================Update Patient====================================");
-            Patient patient1 = iPatientRepo.findById((long) 1).orElse(null);
 
-            if(patient1 != null) {
-                patient1.setMalade(true);
-                iPatientRepo.save(patient);
-            }
+            System.out.println("==========================Patient(Search By Name)====================================");
+            Patient patient = iPatientService.getPatientsByName("John");
+            System.out.println(patient.getId()+" "+patient.getName()+" "+patient.getScore()+" "+patient.getDateNaissance());
 
-            System.out.println("==========================List Patient(Filter By Name)====================================");
-            iPatientRepo.findByNameContains("John").forEach(System.out::println);
-            Page<Patient> patients1 = iPatientRepo.findByMalade(true,PageRequest.of(0,4));
-            patients1.forEach(System.out::println);
+            System.out.println("==========================Patients(Search By malade)====================================");
+            iPatientService.findPatients(true,PageRequest.of(0,4)).forEach(p -> {
+                System.out.println(p.getId()+" "+p.getName()+" "+p.getScore()+" "+p.getDateNaissance());
+            });
 
             /*
             * Delete Patient
             */
-            iPatientRepo.deleteById((long) 1);
+            iPatientService.deletePatient(1L);
 
         };
 
