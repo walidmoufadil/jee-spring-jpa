@@ -1,10 +1,7 @@
 package com.enset.sdia;
 
 import com.enset.sdia.entity.*;
-import com.enset.sdia.service.IConsultationService;
-import com.enset.sdia.service.IMedecinService;
-import com.enset.sdia.service.IPatientService;
-import com.enset.sdia.service.IRendezVousService;
+import com.enset.sdia.service.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -24,7 +21,7 @@ public class Application {
     }
 
     @Bean
-    CommandLineRunner commandLineRunner(ApplicationContext ctx,IConsultationService iConsultationService, IRendezVousService iRendezVousService, IMedecinService iMedecinService, IPatientService iPatientService) {
+    CommandLineRunner commandLineRunner(ApplicationContext ctx,IConsultationService iConsultationService, IRendezVousService iRendezVousService, IMedecinService iMedecinService, IPatientService iPatientService, IUserService iUserService) {
         return args -> {
             Stream.of("Maria","John","Franck","Mohammed")
                     .forEach(
@@ -86,6 +83,29 @@ public class Application {
             * Delete Patient
             */
             iPatientService.deletePatient(1L);
+
+            Stream.of("Doe","Cartner","Ahmadi","Mohammedi").forEach(username -> {
+                iUserService.addUser(User.builder()
+                        .username(username)
+                        .password(username+"123")
+                        .build());
+            });
+
+
+            Stream.of("Admin","User").forEach(rolename -> {
+                iUserService.addRole(Role.builder()
+                        .rolename(rolename)
+                        .description("un role avec plusieurs privileges")
+                        .build());
+            });
+            iUserService.addRoleToUser("Doe","admin");
+            iUserService.addRoleToUser("Doe","user");
+            iUserService.addRoleToUser("Cartner","admin");
+
+            User user = iUserService.authenticate("Doe","Doe123");
+            System.out.println(user.getUsername());
+            System.out.println("roles:");
+            user.getRoles().forEach(System.out::println);
 
         };
 
