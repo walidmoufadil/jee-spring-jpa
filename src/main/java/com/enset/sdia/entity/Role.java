@@ -1,9 +1,9 @@
 package com.enset.sdia.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -16,6 +16,7 @@ public class Role {
     private String description;
     @ManyToMany
     @ToString.Exclude
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<User> users;
 
 }
